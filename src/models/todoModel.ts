@@ -3,7 +3,13 @@ import Redis from 'ioredis';
 const redis = new Redis();
 
 export const getTodos = async () => {
-    return await redis.lrange('todos', 0, -1);  // Lấy tất cả todos
+    try {
+        const todos = await redis.lrange('todos', 0, -1); // Lấy danh sách todos
+        return todos;
+    } catch (error) {
+        console.error('Error fetching todos from Redis:', error);
+        throw new Error('Failed to fetch todos from Redis');
+    }
 };
 export const addTodo = async (task: string) => {
     return await redis.rpush('todos', task);  // Thêm todo vào cuối danh sách
@@ -21,8 +27,17 @@ export const updateTodo = async (index: number, task: string) => {
 };
 
 export const deleteTodo = async (index: number) => {
-    const todos = await redis.lrange('todos', 0, -1);  // Lấy danh sách todos
-    if (index < 0 || index >= todos.length) throw new Error('Index out of range');  // Kiểm tra chỉ mục hợp lệ
-    const taskToRemove = await redis.lindex('todos', index);  // Lấy task tại chỉ mục
-    if (taskToRemove) await redis.lrem('todos', 1, taskToRemove);  // Xóa task
+    try {
+        const todos = await redis.lrange('todos', 0, -1); // Lấy danh sách todos
+        if (!todos || index < 0 || index >= todos.length) {
+            throw new Error('Index out of range');
+        }
+        const taskToRemove = await redis.lindex('todos', index); // Lấy task cần xóa
+        if (taskToRemove) {
+            await redis.lrem('todos', 1, taskToRemove); // Xóa task
+        }
+    } catch (error) {
+        console.error('Error deleting task in Redis:', error);
+        throw new Error('Failed to delete task in Redis');
+    }
 };
