@@ -18,7 +18,7 @@ app.route('/todo', todoRouter);
 // Trang chủ
 app.get('/', (c) => c.text('TODO App with Hono & Redis'));
 
-// Một ví dụ endpoint để kiểm tra kết nối Redis (nếu muốn)
+
 app.get('/check-redis', async (c) => {
     try {
         const pong = await redis.ping();

@@ -1,5 +1,5 @@
 // src/services/get-all.service.ts
-import { getTodos } from '../models/todoModel';  // Đảm bảo rằng tên và đường dẫn đúng
+import { getTodos } from '../models/todoModel';
 
 export const getAllTodolist = async (c: any) => {
     try {
