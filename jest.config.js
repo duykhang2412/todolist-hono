@@ -3,7 +3,7 @@ module.exports = {
     testEnvironment: 'node',
     roots: ['<rootDir>/src/test'],
     moduleNameMapper: {
-        '^src/(.*)$': '<rootDir>/src/$1', // Thêm ánh xạ alias `src/` thành thư mục gốc `src`
+        '^src/(.*)$': '<rootDir>/src/$1',
     },
     testMatch: ['**/*.test.ts'],
     transform: {

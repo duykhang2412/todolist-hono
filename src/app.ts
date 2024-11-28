@@ -6,7 +6,7 @@ import Redis from 'ioredis'; // Nếu sử dụng Redis
 // Khởi tạo ứng dụng Hono
 const app = new Hono();
 
-// Cấu hình kết nối Redis
+// Cấu hình kết nối Redis   
 const redis = new Redis({
     host: 'localhost', // Hoặc URL Redis của bạn
     port: 6379,        // Cổng mặc định của Redis
