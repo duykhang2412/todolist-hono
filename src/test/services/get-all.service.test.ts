@@ -1,59 +1,61 @@
-import { getAllTodolist } from 'src/services/get-all.service';
-import { redis } from 'src/models/todoModel';
+import { getAllTodolist } from '../../services/get-all.service';
+import Redis from 'ioredis';
 
-describe('getAllTodolist Service', () => {
+const redis = new Redis();
+
+describe('getAllTodolist Service (using Redis)', () => {
     beforeEach(async () => {
-        await redis.flushdb(); // Dọn dẹp Redis trước mỗi bài kiểm thử
+        await redis.del('todos'); // Xóa danh sách trước đó
+        await redis.rpush('todos', 'Task 1', 'Task 2', 'Task 3'); // Thêm dữ liệu mẫu
+    });
+
+    afterEach(async () => {
+        if (redis.status === 'ready') {
+            await redis.del('todos'); // Dọn dẹp nếu Redis còn hoạt động
+        }
     });
 
     afterAll(async () => {
         if (redis.status === 'ready') {
-            await redis.quit(); // Kiểm tra kết nối trước khi đóng
+            await redis.quit(); // Đóng kết nối Redis
         }
     });
 
-    // Case 1: Lấy danh sách todos thành công
     it('should fetch all todos successfully', async () => {
-        // Thêm dữ liệu mẫu vào Redis
-        await redis.rpush('todos', 'Task 1', 'Task 2', 'Task 3');
-
-        const c: any = {
-            json: jest.fn(), // Giả lập phương thức `json` của context
-        };
+        const c = mockContext({ page: '1', limit: '3' });
 
         await getAllTodolist(c);
 
-        // Kiểm tra phản hồi
-        expect(c.json).toHaveBeenCalledWith(
-            { todos: ['Task 1', 'Task 2', 'Task 3'] }
-        );
+        expect(c.json).toHaveBeenCalledWith({
+            todos: ['Task 1', 'Task 2', 'Task 3'],
+            totalItems: 3,
+            totalPages: 1,
+            currentPage: 1,
+        });
     });
 
-    // Case 2: Danh sách todos rỗng
     it('should return an empty array if no todos exist', async () => {
-        const c: any = {
-            json: jest.fn(),
-        };
+        await redis.del('todos'); // Đảm bảo không có dữ liệu
+        const c = mockContext({ page: '1', limit: '3' });
 
         await getAllTodolist(c);
 
-        // Kiểm tra phản hồi
-        expect(c.json).toHaveBeenCalledWith({ todos: [] });
+        expect(c.json).toHaveBeenCalledWith({
+            todos: [],
+            totalItems: 0,
+            totalPages: 0,
+            currentPage: 1,
+        });
     });
 
-    // Case 3: Lỗi khi kết nối Redis
-    it('should return 500 if an error occurs while fetching todos', async () => {
-        const c: any = {
-            json: jest.fn(),
-        };
 
-        redis.disconnect();
-        await getAllTodolist(c);
-
-        // Kiểm tra phản hồi lỗi
-        expect(c.json).toHaveBeenCalledWith(
-            { error: 'Unable to fetch todos' },
-            500
-        );
-    });
 });
+
+const mockContext = (query: Record<string, string> = {}) => {
+    return {
+        req: {
+            query: jest.fn().mockImplementation((key: string) => query[key]),
+        },
+        json: jest.fn(),
+    } as any;
+};

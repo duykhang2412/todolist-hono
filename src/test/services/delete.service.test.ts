@@ -1,16 +1,14 @@
 import { deleteTodolist } from 'src/services/delete.service';
 import { redis } from 'src/models/todoModel'; // Kết nối Redis thực tế
 
-describe('deleteTodolist Function', () => {
+describe('deleteTodolist Service', () => {
     beforeEach(async () => {
-        await redis.flushdb();
-        const todos = await redis.lrange('todos', 0, -1);
-        console.log('Todos after flush:', todos); // Kiểm tra xem Redis có thực sự rỗng
+        await redis.flushdb(); // Dọn dẹp Redis trước mỗi bài kiểm tra
     });
 
     afterAll(async () => {
         if (redis.status === 'ready') {
-            await redis.quit(); // Kiểm tra kết nối trước khi đóng
+            await redis.quit(); // Đóng kết nối Redis
         }
     });
 
@@ -28,11 +26,13 @@ describe('deleteTodolist Function', () => {
 
         await deleteTodolist(c);
 
+        // Kiểm tra phản hồi
         expect(c.json).toHaveBeenCalledWith(
             { message: 'Task deleted successfully' },
             200
         );
 
+        // Kiểm tra danh sách sau khi xóa
         const todos = await redis.lrange('todos', 0, -1);
         expect(todos).toEqual(['Task 1', 'Task 3']); // Task 2 đã bị xóa
     });
@@ -48,13 +48,15 @@ describe('deleteTodolist Function', () => {
 
         await deleteTodolist(c);
 
+        // Kiểm tra phản hồi
         expect(c.json).toHaveBeenCalledWith(
             { error: 'Invalid ID' },
             400
         );
 
+        // Đảm bảo không có task nào bị xóa
         const todos = await redis.lrange('todos', 0, -1);
-        expect(todos.length).toBe(0); // Không có task nào bị xóa
+        expect(todos.length).toBe(0);
     });
 
     // Test case 3: Không có task nào để xóa
@@ -68,6 +70,7 @@ describe('deleteTodolist Function', () => {
 
         await deleteTodolist(c);
 
+        // Kiểm tra phản hồi
         expect(c.json).toHaveBeenCalledWith(
             { error: 'No tasks found' },
             404
@@ -88,13 +91,15 @@ describe('deleteTodolist Function', () => {
 
         await deleteTodolist(c);
 
+        // Kiểm tra phản hồi
         expect(c.json).toHaveBeenCalledWith(
             { error: 'Task not found' },
             404
         );
 
+        // Đảm bảo danh sách không thay đổi
         const todos = await redis.lrange('todos', 0, -1);
-        expect(todos).toEqual(['Task 1']); // Không có task nào bị xóa
+        expect(todos).toEqual(['Task 1']);
     });
 
     // Test case 5: Lỗi khi xóa task
@@ -110,8 +115,9 @@ describe('deleteTodolist Function', () => {
 
         await deleteTodolist(c);
 
+        // Kiểm tra phản hồi
         expect(c.json).toHaveBeenCalledWith(
-            { error: 'Failed to fetch todos from Redis' }, // Thay đổi giá trị kỳ vọng
+            { error: 'Failed to delete task(s)' },
             500
         );
     });

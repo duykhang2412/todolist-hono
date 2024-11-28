@@ -3,12 +3,12 @@ import { redis } from 'src/models/todoModel';
 
 describe('updateTodolist Service', () => {
     beforeEach(async () => {
-        await redis.flushdb(); // Dọn dẹp Redis trước mỗi bài kiểm thử
+        await redis.flushdb(); // Dọn dẹp Redis trước mỗi bài kiểm tra
     });
 
     afterAll(async () => {
         if (redis.status === 'ready') {
-            await redis.quit(); // Kiểm tra kết nối trước khi đóng
+            await redis.quit(); // Đóng kết nối Redis
         }
     });
 
@@ -68,7 +68,7 @@ describe('updateTodolist Service', () => {
 
         // Kiểm tra phản hồi lỗi
         expect(c.json).toHaveBeenCalledWith(
-            { error: 'ID is required in the URL' },
+            { error: 'ID is required' },
             400
         );
     });
@@ -89,7 +89,23 @@ describe('updateTodolist Service', () => {
         expect(c.json).toHaveBeenCalledWith({ error: 'Task is required' }, 400);
     });
 
-    // Case 5: Lỗi khi kết nối Redis
+    // Case 5: Task rỗng hoặc chỉ chứa khoảng trắng
+    it('should return 400 if task is empty or only whitespace', async () => {
+        const c: any = {
+            req: {
+                param: jest.fn().mockReturnValue('0'), // ID hợp lệ
+                json: jest.fn().mockResolvedValue({ task: '   ' }), // Task chỉ có khoảng trắng
+            },
+            json: jest.fn(),
+        };
+
+        await updateTodolist(c);
+
+        // Kiểm tra phản hồi lỗi
+        expect(c.json).toHaveBeenCalledWith({ error: 'Task is required' }, 400);
+    });
+
+    // Case 6: Lỗi khi kết nối Redis
     it('should return 500 if an error occurs while updating the task', async () => {
         const c: any = {
             req: {
@@ -105,7 +121,7 @@ describe('updateTodolist Service', () => {
 
         // Kiểm tra phản hồi lỗi
         expect(c.json).toHaveBeenCalledWith(
-            { error: 'Connection is closed.' },
+            { error: 'Failed to update task' },
             500
         );
     });

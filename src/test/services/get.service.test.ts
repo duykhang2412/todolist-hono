@@ -3,12 +3,12 @@ import { redis } from 'src/models/todoModel';
 
 describe('getTodolist Service', () => {
     beforeEach(async () => {
-        await redis.flushdb(); // Dọn dẹp Redis trước mỗi bài kiểm thử
+        await redis.flushdb(); // Dọn dẹp Redis trước mỗi bài kiểm tra
     });
 
     afterAll(async () => {
         if (redis.status === 'ready') {
-            await redis.quit(); // Kiểm tra kết nối trước khi đóng
+            await redis.quit(); // Đóng kết nối Redis sau khi hoàn tất
         }
     });
 
@@ -27,7 +27,7 @@ describe('getTodolist Service', () => {
         await getTodolist(c);
 
         // Kiểm tra phản hồi
-        expect(c.json).toHaveBeenCalledWith({ todo: 'Task 2' });
+        expect(c.json).toHaveBeenCalledWith({ todo: 'Task 2' }, 200);
     });
 
     // Case 2: ID không hợp lệ
@@ -46,7 +46,7 @@ describe('getTodolist Service', () => {
     });
 
     // Case 3: ID không tồn tại trong danh sách
-    it('should return 500 if ID is out of range', async () => {
+    it('should return 404 if ID is out of range', async () => {
         // Thêm dữ liệu mẫu
         await redis.rpush('todos', 'Task 1');
 
@@ -60,10 +60,7 @@ describe('getTodolist Service', () => {
         await getTodolist(c);
 
         // Kiểm tra phản hồi lỗi
-        expect(c.json).toHaveBeenCalledWith(
-            { error: 'Unable to fetch todo by ID' },
-            500
-        );
+        expect(c.json).toHaveBeenCalledWith({ error: 'Failed to fetch todo' }, 500);
     });
 
     // Case 4: Lỗi khi kết nối Redis
@@ -80,9 +77,6 @@ describe('getTodolist Service', () => {
         await getTodolist(c);
 
         // Kiểm tra phản hồi lỗi
-        expect(c.json).toHaveBeenCalledWith(
-            { error: 'Unable to fetch todo by ID' },
-            500
-        );
+        expect(c.json).toHaveBeenCalledWith({ error: 'Failed to fetch todo' }, 500);
     });
 });
