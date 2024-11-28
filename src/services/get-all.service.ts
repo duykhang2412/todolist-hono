@@ -4,7 +4,7 @@ export const getAllTodolist = async (c: any) => {
     try {
         // Lấy query parameters `page` và `limit` từ request
         const page = parseInt(c.req.query('page') || '1', 10);
-        const limit = parseInt(c.req.query('limit') || '4', 10);
+        const limit = parseInt(c.req.query('limit') || '3', 10);
 
         if (page <= 0 || limit <= 0) {
             return c.json({ error: 'Page and limit must be positive integers' }, 400);
@@ -24,14 +24,11 @@ export const getAllTodolist = async (c: any) => {
 
         const totalTodos = todos.length; // Tổng số todos
 
-        // Tính toán offset và giới hạn
         const startIndex = (page - 1) * limit;
         const endIndex = startIndex + limit;
 
-        // Lấy todos cho trang hiện tại
         const paginatedTodos = todos.slice(startIndex, endIndex);
 
-        // Trả về kết quả pagination
         return c.json({
             todos: paginatedTodos,
             totalItems: totalTodos,
@@ -40,6 +37,6 @@ export const getAllTodolist = async (c: any) => {
         });
     } catch (error: unknown) {
         console.error('Error fetching todos with pagination:', error);
-        return c.json({ error: 'Unable to fetch todos' }, 500); // Trả về lỗi nếu có lỗi xảy ra
+        return c.json({ error: 'Unable to fetch todos' }, 500);
     }
 };
