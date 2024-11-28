@@ -1,17 +1,12 @@
 import { Hono } from 'hono';
-import { createTodolist } from '../services/create.service';
-import { getTodolist } from '../services/get.service';
-import { getAllTodolist } from '../services/get-all.service';
-import { updateTodolist } from '../services/update.service';
-import { deleteTodolist } from '../services/delete.service';
+import { createTodolist, getTodolist, getAllTodolist, updateTodolist, deleteTodolist } from '../controllers/todoController';
 
 const todoRouter = new Hono();
 
-// Định nghĩa các routes cho todoRouter
-todoRouter.post('/todo-list/create', createTodolist); // Tạo TODO
-todoRouter.get('/todo-list/get/:id?', getTodolist); // Lấy chi tiết TODO
-todoRouter.get('/todo-list/get-all', getAllTodolist); // Lấy tất cả TODOs
-todoRouter.put('/todo-list/update/:id', updateTodolist); // Cập nhật TODO
-todoRouter.delete('/todo-list/delete/:id', deleteTodolist); // Xóa TODO
+todoRouter.post('/create', createTodolist);
+todoRouter.get('/get/:id?', getTodolist);
+todoRouter.get('/get-all', getAllTodolist);
+todoRouter.put('/update/:id', updateTodolist);
+todoRouter.delete('/delete/:id', deleteTodolist);
 
 export default todoRouter;
