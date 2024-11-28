@@ -13,7 +13,7 @@ const redis = new Redis({
 });
 
 // Gắn router TODO vào ứng dụng
-app.route('/todo', todoRouter); // Đồng bộ với các route đã định nghĩa
+app.route('/todos', todoRouter); // Đồng bộ với các route đã định nghĩa
 
 // Trang chủ
 app.get('/', (c) => c.text('TODO App with Hono & Redis'));
