@@ -5,11 +5,16 @@
         "strict": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "outDir": "dist"
+        "outDir": "dist",
+        "baseUrl": ".", // Đặt base URL là root của dự án
+        "paths": {
+            "src/*": [
+                "src/*"
+            ] // Alias cho src/
+        },
     },
     "include": [
         "src/**/*",
-        "tests/**/*.ts",
-        "src/**/*.test.ts",
+        "test/**/*"
     ]
 }
