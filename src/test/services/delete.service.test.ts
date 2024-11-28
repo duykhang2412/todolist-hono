@@ -3,7 +3,9 @@ import { redis } from 'src/models/todoModel'; // Kết nối Redis thực tế
 
 describe('deleteTodolist Function', () => {
     beforeEach(async () => {
-        await redis.flushdb(); // Dọn dẹp Redis trước mỗi bài kiểm thử
+        await redis.flushdb();
+        const todos = await redis.lrange('todos', 0, -1);
+        console.log('Todos after flush:', todos); // Kiểm tra xem Redis có thực sự rỗng
     });
 
     afterAll(async () => {
