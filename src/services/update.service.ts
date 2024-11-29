@@ -1,4 +1,4 @@
-import { updateTodo } from '../models/todoModel';
+import { updateTodo } from '../models/updateTodo';
 
 export const updateTodolist = async (c: any) => {
     const idParam = c.req.param('id');

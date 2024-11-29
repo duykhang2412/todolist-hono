@@ -1,6 +1,8 @@
 import { Hono } from 'hono';
-import { createTodolist, getTodolist, getAllTodolist, updateTodolist, deleteTodolist } from '../controllers/todoController';
-
+import { createTodolist } from '../controllers/createController';
+import { updateTodolist } from '../controllers/updateController';
+import { deleteTodolist } from '../controllers/deleteController';
+import { getTodolist, getAllTodolist } from '../controllers/getController';
 const todoRouter = new Hono();
 
 todoRouter.post('/create', createTodolist);

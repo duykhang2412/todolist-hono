@@ -1,4 +1,4 @@
-import { addTodo } from '../models/todoModel';
+import { addTodo } from '../models/createTodo';
 
 export const createTodolist = async (c: any) => {
     try {

@@ -6,11 +6,12 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "outDir": "dist",
-        "baseUrl": ".", // Đặt base URL là root của dự án
+        "baseUrl": "./src", // Đặt base URL là root của dự án
         "paths": {
-            "src/*": [
-                "src/*"
-            ] // Alias cho src/
+            "*": [
+                "*"
+            ]
+            // Alias cho src/
         },
     },
     "include": [

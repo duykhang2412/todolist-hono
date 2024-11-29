@@ -1,5 +1,5 @@
-import { getTodos, deleteTodo } from '../models/todoModel';
-
+import { deleteTodo } from '../models/deleteTodo';
+import { getTodos } from '../models/getTodo'
 export const deleteTodolist = async (c: any) => {
     try {
         // Lấy danh sách ID từ URL param `:id` (phân tách bởi dấu phẩy)
